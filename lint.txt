@@ -1,0 +1,6 @@
+
+> student-attendance-analyzer@1.0.0 lint
+> eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0
+
+'eslint' is not recognized as an internal or external command,
+operable program or batch file.
