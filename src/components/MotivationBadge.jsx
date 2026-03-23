@@ -9,8 +9,8 @@ const MotivationBadge = ({ badge, percentage, size = 'normal' }) => {
           icon: Award,
           text: 'Consistent Learner',
           className: 'badge-consistent',
-          color: '#10b981',
-          bg: 'rgba(16, 185, 129, 0.1)',
+          color: '#22c55e',
+          bg: 'rgba(34, 197, 94, 0.12)',
           message: 'Excellent attendance! Keep it up!'
         };
       case 'needs-improvement':
@@ -18,8 +18,8 @@ const MotivationBadge = ({ badge, percentage, size = 'normal' }) => {
           icon: TrendingUp,
           text: 'Needs Improvement',
           className: 'badge-improvement',
-          color: '#f59e0b',
-          bg: 'rgba(245, 158, 11, 0.1)',
+          color: '#f97316',
+          bg: 'rgba(249, 115, 22, 0.12)',
           message: 'Good effort! A little more consistency needed.'
         };
       case 'at-risk':
@@ -27,8 +27,8 @@ const MotivationBadge = ({ badge, percentage, size = 'normal' }) => {
           icon: AlertTriangle,
           text: 'At Risk',
           className: 'badge-risk',
-          color: '#ef4444',
-          bg: 'rgba(239, 68, 68, 0.1)',
+          color: '#f43f5e',
+          bg: 'rgba(244, 63, 94, 0.12)',
           message: 'Critical! Please improve your attendance.'
         };
       default:
@@ -36,8 +36,8 @@ const MotivationBadge = ({ badge, percentage, size = 'normal' }) => {
           icon: Award,
           text: 'No Badge',
           className: 'badge-improvement',
-          color: '#6366f1',
-          bg: 'rgba(99, 102, 241, 0.1)',
+          color: '#7c3aed',
+          bg: 'rgba(124, 58, 237, 0.1)',
           message: 'Start attending classes to earn a badge!'
         };
     }
@@ -86,24 +86,24 @@ const MotivationBadge = ({ badge, percentage, size = 'normal' }) => {
         fontFamily: 'Outfit, sans-serif',
         fontSize: '2rem',
         fontWeight: '700',
-        color: '#0f172a',
+        color: '#1e1b4b',
         marginBottom: '0.25rem'
       }}>
         {percentage}%
       </div>
 
-      <div style={{ fontSize: '0.95rem', color: '#64748b' }}>
+      <div style={{ fontSize: '0.95rem', color: '#6b21a8' }}>
         Overall Attendance
       </div>
 
       <div style={{
         marginTop: '1.5rem',
         padding: '0.75rem 1rem',
-        backgroundColor: '#f8fafc',
+        backgroundColor: 'rgba(124, 58, 237, 0.04)',
         borderRadius: '0.5rem',
-        color: '#475569',
+        color: '#6b21a8',
         fontSize: '0.875rem',
-        border: '1px solid #e2e8f0',
+        border: '1px solid rgba(196, 181, 253, 0.3)',
         width: '100%'
       }}>
         {config.message}

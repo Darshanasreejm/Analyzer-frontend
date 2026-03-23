@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Calendar, BarChart3, Download, AlertCircle } from 'lucide-react';
+import { Users, Calendar, BarChart3, Download, AlertCircle, QrCode, FileSpreadsheet } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import DailyTrendsChart from './DailyTrendsChart';
 import SubjectHeatmap from './SubjectHeatmap';
 import StudentRankings from './StudentRankings';
 import PredictionModule from './PredictionModule';
+import LivePolls from './LivePolls';
 import {
   getDailyTrends,
   getSubjectHeatmap,
   getStudentRankings,
   predictAtRiskStudents,
-  generateReport,
   mockSubjects,
   mockStudents
 } from '../services/mockData';
@@ -19,20 +20,23 @@ const FacultyDashboard = () => {
   const [selectedSubject, setSelectedSubject] = useState(mockSubjects[0].id);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [attendanceMarks, setAttendanceMarks] = useState({});
+  const [showQR, setShowQR] = useState(false);
 
   const dailyTrends = getDailyTrends(30);
   const subjectHeatmap = getSubjectHeatmap();
   const studentRankings = getStudentRankings();
   const predictions = predictAtRiskStudents();
 
-  // Initialize attendance marks
+  const mappedStudents = mockStudents.filter(s => !s.enrolledSubjects || s.enrolledSubjects.includes(selectedSubject));
+
+  // Initialize attendance marks when selected subject changes
   useEffect(() => {
     const marks = {};
-    mockStudents.forEach(student => {
+    mappedStudents.forEach(student => {
       marks[student.id] = 'present';
     });
     setAttendanceMarks(marks);
-  }, []);
+  }, [selectedSubject]);
 
   const handleMarkAttendance = (studentId, status) => {
     setAttendanceMarks(prev => ({
@@ -51,15 +55,26 @@ const FacultyDashboard = () => {
     });
   };
 
-  const handleGenerateReport = (type) => {
-    const report = generateReport(type);
-    console.log(`${type} report:`, report);
-    alert(`${type.charAt(0).toUpperCase() + type.slice(1)} report generated! Check console for details.`);
+  const handleGenerateCSV = () => {
+    // Basic CSV generation for demo
+    const rows = [
+      ['Roll Number', 'Student Name', 'Current %', 'Status For Today'],
+      ...mappedStudents.map(s => [s.rollNumber, s.name, `${s.attendancePercentage}%`, attendanceMarks[s.id] || 'N/A'])
+    ];
+
+    const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `attendance_${selectedSubject}_${selectedDate}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
-  const totalPresent = Object.values(attendanceMarks).filter(m => m === 'present').length;
-  const totalAbsent = Object.values(attendanceMarks).filter(m => m === 'absent').length;
-  const totalLate = Object.values(attendanceMarks).filter(m => m === 'late').length;
+  const totalPresent = mappedStudents.filter(m => attendanceMarks[m.id] === 'present').length;
+  const totalAbsent = mappedStudents.filter(m => attendanceMarks[m.id] === 'absent').length;
+  const totalLate = mappedStudents.filter(m => attendanceMarks[m.id] === 'late').length;
 
   return (
     <div className="fade-in">
@@ -71,23 +86,16 @@ const FacultyDashboard = () => {
         flexWrap: 'wrap',
         gap: '1rem'
       }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#0f172a', fontFamily: 'Outfit, sans-serif' }}>
+        <h1 style={{ fontSize: '2rem', fontWeight: '700', color: '#1e1b4b', fontFamily: 'Outfit, sans-serif' }}>
           Faculty Dashboard
         </h1>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button
             className="btn btn-secondary"
-            onClick={() => handleGenerateReport('weekly')}
+            onClick={handleGenerateCSV}
           >
-            <Download size={18} />
-            Weekly Report
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => handleGenerateReport('monthly')}
-          >
-            <Download size={18} />
-            Monthly Report
+            <FileSpreadsheet size={18} />
+            Export CSV
           </button>
         </div>
       </div>
@@ -96,7 +104,7 @@ const FacultyDashboard = () => {
       <div style={{
         display: 'flex',
         gap: '1rem',
-        borderBottom: '1px solid #e2e8f0',
+        borderBottom: '1px solid var(--border-color)',
         marginBottom: '2rem',
         overflowX: 'auto',
         paddingBottom: '2px'
@@ -107,8 +115,8 @@ const FacultyDashboard = () => {
             padding: '1rem 1.5rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'overview' ? '3px solid #6366f1' : '3px solid transparent',
-            color: activeTab === 'overview' ? '#6366f1' : '#64748b',
+            borderBottom: activeTab === 'overview' ? '3px solid #7c3aed' : '3px solid transparent',
+            color: activeTab === 'overview' ? '#7c3aed' : '#6b21a8',
             fontWeight: 600,
             cursor: 'pointer',
             transition: 'all 0.3s',
@@ -127,8 +135,8 @@ const FacultyDashboard = () => {
             padding: '1rem 1.5rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'mark' ? '3px solid #6366f1' : '3px solid transparent',
-            color: activeTab === 'mark' ? '#6366f1' : '#64748b',
+            borderBottom: activeTab === 'mark' ? '3px solid #7c3aed' : '3px solid transparent',
+            color: activeTab === 'mark' ? '#7c3aed' : '#6b21a8',
             fontWeight: 600,
             cursor: 'pointer',
             transition: 'all 0.3s',
@@ -147,8 +155,8 @@ const FacultyDashboard = () => {
             padding: '1rem 1.5rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'predictions' ? '3px solid #6366f1' : '3px solid transparent',
-            color: activeTab === 'predictions' ? '#6366f1' : '#64748b',
+            borderBottom: activeTab === 'predictions' ? '3px solid #7c3aed' : '3px solid transparent',
+            color: activeTab === 'predictions' ? '#7c3aed' : '#6b21a8',
             fontWeight: 600,
             cursor: 'pointer',
             transition: 'all 0.3s',
@@ -160,6 +168,46 @@ const FacultyDashboard = () => {
         >
           <AlertCircle size={18} />
           Predictions
+        </button>
+        <button
+          onClick={() => setActiveTab('qr')}
+          style={{
+            padding: '1rem 1.5rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'qr' ? '3px solid #7c3aed' : '3px solid transparent',
+            color: activeTab === 'qr' ? '#7c3aed' : '#6b21a8',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
+        >
+          <QrCode size={18} />
+          Live QR Generator
+        </button>
+        <button
+          onClick={() => setActiveTab('polls')}
+          style={{
+            padding: '1rem 1.5rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'polls' ? '3px solid #7c3aed' : '3px solid transparent',
+            color: activeTab === 'polls' ? '#7c3aed' : '#6b21a8',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
+        >
+          <BarChart3 size={18} />
+          Live Polls
         </button>
       </div>
 
@@ -239,7 +287,7 @@ const FacultyDashboard = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
               <div className="form-group mb-0">
-                <label className="form-label" style={{ fontWeight: 600, color: '#334155' }}>Select Subject</label>
+                <label className="form-label" style={{ fontWeight: 600, color: '#6b21a8' }}>Select Subject</label>
                 <select
                   className="form-select"
                   value={selectedSubject}
@@ -255,7 +303,7 @@ const FacultyDashboard = () => {
               </div>
 
               <div className="form-group mb-0">
-                <label className="form-label" style={{ fontWeight: 600, color: '#334155' }}>Select Date</label>
+                <label className="form-label" style={{ fontWeight: 600, color: '#6b21a8' }}>Select Date</label>
                 <input
                   type="date"
                   className="form-input"
@@ -273,21 +321,21 @@ const FacultyDashboard = () => {
               gap: '1rem',
               marginBottom: '2rem',
               padding: '1.5rem',
-              backgroundColor: '#f8fafc',
+              backgroundColor: 'rgba(124, 58, 237, 0.03)',
               borderRadius: '0.75rem',
-              border: '1px solid #e2e8f0'
+              border: '1px solid rgba(196, 181, 253, 0.35)'
             }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.25rem', fontWeight: 500 }}>Present</div>
-                <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.75rem', fontWeight: '700', color: '#10b981' }}>{totalPresent}</div>
+                <div style={{ fontSize: '0.875rem', color: '#6b21a8', marginBottom: '0.25rem', fontWeight: 500 }}>Present</div>
+                <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.75rem', fontWeight: '700', color: '#22c55e' }}>{totalPresent}</div>
               </div>
-              <div style={{ textAlign: 'center', borderLeft: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.25rem', fontWeight: 500 }}>Late</div>
-                <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.75rem', fontWeight: '700', color: '#f59e0b' }}>{totalLate}</div>
+              <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(196,181,253,0.3)', borderRight: '1px solid rgba(196,181,253,0.3)' }}>
+                <div style={{ fontSize: '0.875rem', color: '#6b21a8', marginBottom: '0.25rem', fontWeight: 500 }}>Late</div>
+                <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.75rem', fontWeight: '700', color: '#f97316' }}>{totalLate}</div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '0.25rem', fontWeight: 500 }}>Absent</div>
-                <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.75rem', fontWeight: '700', color: '#ef4444' }}>{totalAbsent}</div>
+                <div style={{ fontSize: '0.875rem', color: '#6b21a8', marginBottom: '0.25rem', fontWeight: 500 }}>Absent</div>
+                <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.75rem', fontWeight: '700', color: '#f43f5e' }}>{totalAbsent}</div>
               </div>
             </div>
 
@@ -302,9 +350,9 @@ const FacultyDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockStudents.map(student => (
+                  {mappedStudents.map(student => (
                     <tr key={student.id}>
-                      <td style={{ fontWeight: 600, color: '#0f172a' }}>{student.rollNumber}</td>
+                      <td style={{ fontWeight: 600, color: '#1e1b4b' }}>{student.rollNumber}</td>
                       <td>
                         <div style={{ fontWeight: 500 }}>{student.name}</div>
                       </td>
@@ -312,12 +360,12 @@ const FacultyDashboard = () => {
                         <span
                           className="badge"
                           style={{
-                            backgroundColor: student.attendancePercentage >= 90 ? '#d1fae5' :
-                              student.attendancePercentage >= 60 ? '#fef3c7' : '#fee2e2',
-                            color: student.attendancePercentage >= 90 ? '#059669' :
-                              student.attendancePercentage >= 60 ? '#d97706' : '#dc2626',
-                            border: `1px solid ${student.attendancePercentage >= 90 ? '#a7f3d0' :
-                                student.attendancePercentage >= 60 ? '#fde68a' : '#fecaca'
+                            backgroundColor: student.attendancePercentage >= 90 ? 'rgba(34,197,94,0.12)' :
+                              student.attendancePercentage >= 60 ? 'rgba(249,115,22,0.1)' : 'rgba(244,63,94,0.1)',
+                            color: student.attendancePercentage >= 90 ? '#16a34a' :
+                              student.attendancePercentage >= 60 ? '#ea580c' : '#e11d48',
+                            border: `1px solid ${student.attendancePercentage >= 90 ? 'rgba(34,197,94,0.25)' :
+                                student.attendancePercentage >= 60 ? 'rgba(249,115,22,0.25)' : 'rgba(244,63,94,0.25)'
                               }`
                           }}>
                           {student.attendancePercentage}%
@@ -330,9 +378,9 @@ const FacultyDashboard = () => {
                             style={{
                               padding: '0.35rem 0.75rem',
                               fontSize: '0.875rem',
-                              backgroundColor: attendanceMarks[student.id] === 'present' ? '#10b981' : 'transparent',
-                              color: attendanceMarks[student.id] === 'present' ? 'white' : '#10b981',
-                              border: `1px solid #10b981`
+                              backgroundColor: attendanceMarks[student.id] === 'present' ? '#22c55e' : 'transparent',
+                              color: attendanceMarks[student.id] === 'present' ? 'white' : '#22c55e',
+                              border: `1px solid #22c55e`
                             }}
                             onClick={() => handleMarkAttendance(student.id, 'present')}
                           >
@@ -343,9 +391,9 @@ const FacultyDashboard = () => {
                             style={{
                               padding: '0.35rem 0.75rem',
                               fontSize: '0.875rem',
-                              backgroundColor: attendanceMarks[student.id] === 'late' ? '#f59e0b' : 'transparent',
-                              color: attendanceMarks[student.id] === 'late' ? 'white' : '#f59e0b',
-                              border: `1px solid #f59e0b`
+                              backgroundColor: attendanceMarks[student.id] === 'late' ? '#f97316' : 'transparent',
+                              color: attendanceMarks[student.id] === 'late' ? 'white' : '#f97316',
+                              border: `1px solid #f97316`
                             }}
                             onClick={() => handleMarkAttendance(student.id, 'late')}
                           >
@@ -356,9 +404,9 @@ const FacultyDashboard = () => {
                             style={{
                               padding: '0.35rem 0.75rem',
                               fontSize: '0.875rem',
-                              backgroundColor: attendanceMarks[student.id] === 'absent' ? '#ef4444' : 'transparent',
-                              color: attendanceMarks[student.id] === 'absent' ? 'white' : '#ef4444',
-                              border: `1px solid #ef4444`
+                              backgroundColor: attendanceMarks[student.id] === 'absent' ? '#f43f5e' : 'transparent',
+                              color: attendanceMarks[student.id] === 'absent' ? 'white' : '#f43f5e',
+                              border: `1px solid #f43f5e`
                             }}
                             onClick={() => handleMarkAttendance(student.id, 'absent')}
                           >
@@ -389,6 +437,62 @@ const FacultyDashboard = () => {
       {activeTab === 'predictions' && (
         <div className="fade-in">
           <PredictionModule predictions={predictions} />
+        </div>
+      )}
+
+      {/* QR Generator Tab */}
+      {activeTab === 'qr' && (
+        <div className="fade-in">
+          <div className="card" style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+            <div className="card-header pb-2 mx-auto justify-content-center border-0">
+               <h2 className="card-title justify-content-center">
+                <QrCode size={24} className="text-primary" />
+                Live Attendance Session
+               </h2>
+            </div>
+            
+            <p className="text-secondary mb-4">Select a subject for students to scan and mark attendance.</p>
+            
+            <div className="form-group text-left mb-4">
+              <label className="form-label text-left">Target Subject Context</label>
+              <select
+                className="form-select"
+                value={selectedSubject}
+                onChange={(e) => {
+                  setSelectedSubject(e.target.value);
+                  setShowQR(false);
+                }}
+              >
+                {mockSubjects.map(s => (
+                  <option key={s.id} value={s.id}>{s.code} - {s.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {!showQR ? (
+               <button className="btn btn-primary" onClick={() => setShowQR(true)}>Generate QR Code</button>
+            ) : (
+               <div className="mt-4 fade-in pt-3 pb-3" style={{ background: '#fff', borderRadius: '1rem', display: 'inline-block', padding: '2rem' }}>
+                  {/* Generating a payload with the subjectId and a timestamp */}
+                  <QRCodeSVG 
+                    value={JSON.stringify({ subject: selectedSubject, ts: Date.now() })} 
+                    size={250} 
+                    level={"H"}
+                    includeMargin={true}
+                  />
+                  <div className="mt-3 text-secondary" style={{ fontSize: '0.9rem' }}>
+                    <p>Have students scan this using the app.</p>
+                  </div>
+               </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Live Polls Tab */}
+      {activeTab === 'polls' && (
+        <div className="fade-in">
+          <LivePolls userRole="faculty" />
         </div>
       )}
     </div>

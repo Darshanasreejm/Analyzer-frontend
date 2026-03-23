@@ -11,6 +11,16 @@ const seedData = async () => {
         await User.deleteMany({});
         console.log('Cleared existing users collection.');
 
+        // Seed Admin
+        const adminData = [
+            {
+                name: 'System Administrator',
+                email: 'admin@college.edu',
+                password: 'adminpassword',
+                role: 'admin'
+            }
+        ];
+
         // Seed Faculty
         const facultyData = [
             {
@@ -72,12 +82,42 @@ const seedData = async () => {
                 department: 'MTRS',
                 semester: '4',
                 section: 'B'
+            },
+            {
+                name: 'Arjun Kumar',
+                email: 'arjun@student.edu',
+                password: 'studentpassword',
+                role: 'student',
+                rollNumber: 'MECH002',
+                department: 'MECH',
+                semester: '4',
+                section: 'A'
+            },
+            {
+                name: 'Priya Sharma',
+                email: 'priya@student.edu',
+                password: 'studentpassword',
+                role: 'student',
+                rollNumber: 'MTRS002',
+                department: 'MTRS',
+                semester: '4',
+                section: 'A'
+            },
+            {
+                name: 'Karthik Nair',
+                email: 'karthik@student.edu',
+                password: 'studentpassword',
+                role: 'student',
+                rollNumber: 'MECH003',
+                department: 'MECH',
+                semester: '4',
+                section: 'B'
             }
         ];
 
         // Combine and insert
-        await User.insertMany([...facultyData, ...studentData]);
-        console.log('Successfully seeded 4 faculty and 2 students into Atlas DB!');
+        await User.insertMany([...adminData, ...facultyData, ...studentData]);
+        console.log('Successfully seeded 1 admin, 4 faculty and 5 students into Atlas DB!');
 
         process.exit();
     } catch (error) {

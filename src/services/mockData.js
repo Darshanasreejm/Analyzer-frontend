@@ -1,10 +1,19 @@
 export const mockUsers = {
+    admin: {
+        id: 'admin-1',
+        name: 'Super Admin',
+        role: 'admin'
+    },
     student: {
         id: 'student-1',
         motivationBadge: 'consistent',
+        role: 'student',
+        name: 'Alice Smith'
     },
     faculty: {
-        id: 'faculty-1'
+        id: 'faculty-1',
+        role: 'faculty',
+        name: 'Prof. Anderson'
     }
 };
 
@@ -31,15 +40,17 @@ export const getStudentAttendance = (id) => {
 };
 
 export const mockSubjects = [
-    { id: 'sub-1', code: 'CS101', name: 'Intro to CS' },
-    { id: 'sub-2', code: 'MA201', name: 'Calculus II' },
-    { id: 'sub-3', code: 'PH101', name: 'Physics I' },
+    { id: 'sub-1', code: 'CS101', name: 'Intro to CS', facultyId: 'faculty-1' },
+    { id: 'sub-2', code: 'MA201', name: 'Calculus II', facultyId: 'faculty-1' },
+    { id: 'sub-3', code: 'PH101', name: 'Physics I', facultyId: 'faculty-2' },
 ];
 
 export const mockStudents = [
-    { id: 'stu-1', rollNumber: 'R001', name: 'Alice Smith', attendancePercentage: 92 },
-    { id: 'stu-2', rollNumber: 'R002', name: 'Bob Jones', attendancePercentage: 75 },
-    { id: 'stu-3', rollNumber: 'R003', name: 'Charlie Brown', attendancePercentage: 55 },
+    { id: 'stu-1', rollNumber: 'R001', name: 'Alice Smith', attendancePercentage: 92, enrolledSubjects: ['sub-1', 'sub-2'] },
+    { id: 'stu-2', rollNumber: 'R002', name: 'Bob Jones', attendancePercentage: 75, enrolledSubjects: ['sub-1', 'sub-3'] },
+    { id: 'stu-3', rollNumber: 'R003', name: 'Charlie Brown', attendancePercentage: 55, enrolledSubjects: ['sub-2', 'sub-3'] },
+    { id: 'stu-4', rollNumber: 'R004', name: 'Diana King', attendancePercentage: 92, enrolledSubjects: ['sub-1'] },
+    { id: 'stu-5', rollNumber: 'R005', name: 'Eve Davies', attendancePercentage: 88, enrolledSubjects: ['sub-1', 'sub-2', 'sub-3'] },
 ];
 
 export const getDailyTrends = (days) => {

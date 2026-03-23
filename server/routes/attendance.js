@@ -38,4 +38,47 @@ router.get('/student/:studentId', async (req, res) => {
     }
 });
 
+// @route   POST /api/attendance/mark-qr
+// @desc    Mark attendance via QR code scan
+// @access  Public (in real app, should be Private)
+router.post('/mark-qr', async (req, res) => {
+    const { studentId, subject } = req.body;
+
+    if (!studentId || !subject) {
+        return res.status(400).json({ message: 'Student ID and subject are required' });
+    }
+
+    try {
+        // Prevent duplicate attendance for the same day (simplified check)
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const existingRecord = await Attendance.findOne({
+            studentId,
+            subject,
+            date: { $gte: startOfDay, $lte: endOfDay }
+        });
+
+        if (existingRecord) {
+            return res.status(400).json({ message: 'Attendance already marked for today in this subject' });
+        }
+
+        const newRecord = new Attendance({
+            studentId,
+            subject,
+            status: 'Present' // QR scan implies presence
+        });
+
+        await newRecord.save();
+        res.json({ message: 'Attendance marked successfully', record: newRecord });
+
+    } catch (error) {
+        console.error('Error marking QR attendance:', error);
+        res.status(500).json({ message: 'Server error marking attendance' });
+    }
+});
+
 module.exports = router;

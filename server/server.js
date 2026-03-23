@@ -23,6 +23,8 @@ const attendanceRoutes = require('./routes/attendance');
 app.use('/api', authRoutes); // login
 app.use('/api/users', userRoutes); // profile fetch/update
 app.use('/api/attendance', attendanceRoutes); // attendance records
+app.use('/api/alerts', require('./routes/alerts')); // Mocked email alerts
+app.use('/api/polls', require('./routes/polls')); // Live polling
 
 app.get('/', (req, res) => {
     res.send('Attendance Analyzer API is running');

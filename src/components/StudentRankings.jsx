@@ -4,10 +4,10 @@ import MotivationBadge from './MotivationBadge';
 
 const StudentRankings = ({ students }) => {
   const getMedalIcon = (rank) => {
-    if (rank === 1) return <Trophy size={24} color="#f59e0b" />;
-    if (rank === 2) return <Medal size={24} color="#94a3b8" />;
-    if (rank === 3) return <Award size={24} color="#b45309" />;
-    return <span style={{ width: '24px', textAlign: 'center', fontWeight: 'bold', color: '#64748b' }}>{rank}</span>;
+    if (rank === 1) return <Trophy size={24} color="#f97316" />;
+    if (rank === 2) return <Medal size={24} color="#a78bfa" />;
+    if (rank === 3) return <Award size={24} color="#ea580c" />;
+    return <span style={{ width: '24px', textAlign: 'center', fontWeight: 'bold', color: '#6b21a8' }}>{rank}</span>;
   };
 
   return (
@@ -38,8 +38,8 @@ const StudentRankings = ({ students }) => {
                   </div>
                 </td>
                 <td>
-                  <div style={{ fontWeight: 600, color: '#0f172a' }}>{student.name}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
+                  <div style={{ fontWeight: 600, color: '#1e1b4b' }}>{student.name}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b21a8', marginTop: '0.25rem' }}>
                     {student.rollNumber}
                   </div>
                 </td>
@@ -48,8 +48,8 @@ const StudentRankings = ({ students }) => {
                     fontFamily: 'Outfit, sans-serif',
                     fontSize: '1.25rem',
                     fontWeight: '700',
-                    color: student.attendancePercentage >= 90 ? '#10b981' :
-                      student.attendancePercentage >= 60 ? '#f59e0b' : '#ef4444'
+                    color: student.attendancePercentage >= 90 ? '#22c55e' :
+                      student.attendancePercentage >= 60 ? '#f97316' : '#f43f5e'
                   }}>
                     {student.attendancePercentage}%
                   </div>
@@ -66,23 +66,23 @@ const StudentRankings = ({ students }) => {
       <div style={{
         marginTop: '1.5rem',
         padding: '1.25rem',
-        backgroundColor: '#f8fafc',
+        backgroundColor: 'rgba(124, 58, 237, 0.04)',
         borderRadius: '0.75rem',
-        border: '1px solid #e2e8f0',
+        border: '1px solid rgba(196, 181, 253, 0.3)',
         fontSize: '0.875rem'
       }}>
-        <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '0.75rem' }}>Badge Criteria:</div>
+        <div style={{ fontWeight: 600, color: '#1e1b4b', marginBottom: '0.75rem' }}>Badge Criteria:</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#475569' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6b21a8' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e' }} />
             Consistent Learner: ≥90%
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#475569' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f59e0b' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6b21a8' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f97316' }} />
             Needs Improvement: 60-89%
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#475569' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#6b21a8' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f43f5e' }} />
             At Risk: &lt;60%
           </div>
         </div>

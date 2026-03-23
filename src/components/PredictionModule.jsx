@@ -1,15 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AlertTriangle, TrendingDown, Bell, TrendingUp, Minus } from 'lucide-react';
+import { apiSendAlert } from '../services/api';
 
 const PredictionModule = ({ predictions }) => {
+  const [sending, setSending] = useState(false);
+
   const getRiskColor = (level) => {
-    return level === 'high' ? '#ef4444' : '#f59e0b';
+    return level === 'high' ? '#f43f5e' : '#f97316';
   };
 
   const getTrendIcon = (trend) => {
-    if (trend === 'declining') return <TrendingDown size={18} color="#ef4444" />;
-    if (trend === 'stable') return <Minus size={18} color="#f59e0b" />;
-    return <TrendingUp size={18} color="#10b981" />;
+    if (trend === 'declining') return <TrendingDown size={18} color="#f43f5e" />;
+    if (trend === 'stable') return <Minus size={18} color="#f97316" />;
+    return <TrendingUp size={18} color="#22c55e" />;
+  };
+
+  const handleSendAlerts = async () => {
+    setSending(true);
+    try {
+      // Find high risk students to alert
+      const highRiskStudents = predictions.filter(p => p.riskLevel === 'high');
+      
+      for (const student of highRiskStudents) {
+        // We're mocking the student ID here since mock data format differs slightly
+        await apiSendAlert(student.id || 'mock-id', `URGENT: Your attendance has dropped to ${student.currentAttendance}%. ${student.recommendation}`);
+      }
+      
+      alert(`Successfully sent alerts to ${highRiskStudents.length} at-risk students.`);
+    } catch (error) {
+      console.error('Failed to send alerts', error);
+      alert('Failed to send some alerts');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -19,9 +42,14 @@ const PredictionModule = ({ predictions }) => {
           <AlertTriangle size={22} className="text-primary" />
           <span>At-Risk Student Predictions</span>
         </h2>
-        <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+        <button 
+          className="btn btn-primary" 
+          style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+          onClick={handleSendAlerts}
+          disabled={sending}
+        >
           <Bell size={16} />
-          <span>Send Reminders</span>
+          <span>{sending ? 'Sending...' : 'Send Reminders'}</span>
         </button>
       </div>
 
@@ -29,13 +57,13 @@ const PredictionModule = ({ predictions }) => {
         <div style={{
           textAlign: 'center',
           padding: '3rem 2rem',
-          color: '#64748b',
-          backgroundColor: '#f8fafc',
+          color: '#6b21a8',
+          backgroundColor: 'rgba(124, 58, 237, 0.04)',
           borderRadius: '0.75rem',
-          border: '1px dashed #cbd5e1'
+          border: '1px dashed rgba(196, 181, 253, 0.5)'
         }}>
           <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</div>
-          <div style={{ fontSize: '1.125rem', fontWeight: 600, color: '#0f172a' }}>All Students Doing Well!</div>
+          <div style={{ fontSize: '1.125rem', fontWeight: 600, color: '#1e1b4b' }}>All Students Doing Well!</div>
           <div style={{ marginTop: '0.5rem' }}>No students at risk currently based on our predictive model.</div>
         </div>
       ) : (
@@ -55,15 +83,15 @@ const PredictionModule = ({ predictions }) => {
               {predictions.map((pred, index) => (
                 <tr key={index}>
                   <td>
-                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{pred.student}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
+                    <div style={{ fontWeight: 600, color: '#1e1b4b' }}>{pred.student}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#6b21a8', marginTop: '0.25rem' }}>
                       {pred.rollNumber}
                     </div>
                   </td>
                   <td className="text-center">
                     <span style={{
                       fontWeight: '700',
-                      color: pred.currentAttendance < 60 ? '#ef4444' : '#f59e0b',
+                      color: pred.currentAttendance < 60 ? '#f43f5e' : '#f97316',
                       fontFamily: 'Outfit, sans-serif',
                       fontSize: '1.125rem'
                     }}>
@@ -74,9 +102,9 @@ const PredictionModule = ({ predictions }) => {
                     <span
                       className="badge"
                       style={{
-                        backgroundColor: pred.recentAbsences >= 3 ? '#fee2e2' : '#fef3c7',
-                        color: pred.recentAbsences >= 3 ? '#dc2626' : '#d97706',
-                        border: `1px solid ${pred.recentAbsences >= 3 ? '#fecaca' : '#fde68a'}`
+                        backgroundColor: pred.recentAbsences >= 3 ? 'rgba(244,63,94,0.1)' : 'rgba(249,115,22,0.1)',
+                        color: pred.recentAbsences >= 3 ? '#e11d48' : '#ea580c',
+                        border: `1px solid ${pred.recentAbsences >= 3 ? 'rgba(244,63,94,0.25)' : 'rgba(249,115,22,0.25)'}`
                       }}>
                       {pred.recentAbsences} / 10
                     </span>
@@ -98,7 +126,7 @@ const PredictionModule = ({ predictions }) => {
                     </span>
                   </td>
                   <td>
-                    <div style={{ fontSize: '0.875rem', color: '#475569', lineHeight: 1.5 }}>
+                    <div style={{ fontSize: '0.875rem', color: '#6b21a8', lineHeight: 1.5 }}>
                       {pred.recommendation}
                     </div>
                   </td>
@@ -112,26 +140,26 @@ const PredictionModule = ({ predictions }) => {
       <div style={{
         marginTop: '1.5rem',
         padding: '1.25rem',
-        backgroundColor: '#fffbeb',
+        backgroundColor: 'rgba(124, 58, 237, 0.04)',
         borderRadius: '0.75rem',
-        border: '1px solid #fde68a',
+        border: '1px solid rgba(196, 181, 253, 0.35)',
         display: 'flex',
         gap: '1rem',
         alignItems: 'flex-start'
       }}>
         <div style={{
           padding: '0.5rem',
-          backgroundColor: '#fef3c7',
+          backgroundColor: 'rgba(124, 58, 237, 0.1)',
           borderRadius: '50%',
-          color: '#d97706'
+          color: '#7c3aed'
         }}>
           <Bell size={20} strokeWidth={2} />
         </div>
         <div>
-          <div style={{ fontWeight: 600, color: '#92400e', marginBottom: '0.25rem' }}>
+          <div style={{ fontWeight: 600, color: '#6d28d9', marginBottom: '0.25rem' }}>
             Smart Reminder System
           </div>
-          <div style={{ fontSize: '0.875rem', color: '#b45309', lineHeight: 1.5 }}>
+          <div style={{ fontSize: '0.875rem', color: '#6b21a8', lineHeight: 1.5 }}>
             Students with declining trends will automatically receive personalized reminder notifications
             to help them improve their attendance patterns.
           </div>

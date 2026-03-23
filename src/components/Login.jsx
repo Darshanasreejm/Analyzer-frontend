@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { GraduationCap, User, Lock, BookOpen } from 'lucide-react';
+import { GraduationCap, User, Lock, BookOpen, ShieldCheck } from 'lucide-react';
+import { apiLogin } from '../services/api';
 
 const Login = ({ onLogin }) => {
   const [selectedRole, setSelectedRole] = useState('student');
@@ -11,26 +12,17 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Sending email and password as query parameters in a GET request to the backend.
-      // (Note: For security reasons, POST is generally recommended for sending passwords, but using GET as requested.)
-      const response = await fetch(`http://localhost:5000/api/login?email=${encodeURIComponent(credentials.email)}&password=${encodeURIComponent(credentials.password)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Pass the entire user data to the parent component
-        onLogin(data);
-      } else {
-        alert(data.message || 'Login failed! Please check your credentials.');
+      const data = await apiLogin(credentials.email, credentials.password);
+      
+      // Store token securely (localStorage for demo purposes)
+      if (data.token) {
+        localStorage.setItem('currentUser', JSON.stringify({ ...data, role: selectedRole }));
       }
+      
+      onLogin(data);
     } catch (error) {
       console.error('Login error:', error);
-      alert('Error connecting to the server. Please ensure the backend is running.');
+      alert(error.message || 'Error connecting to the server.');
     }
   };
 
@@ -46,20 +38,30 @@ const Login = ({ onLogin }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="fade-in" style={{ animationDelay: '0.3s' }}>
-          <div className="role-selector">
+          <div className="role-selector" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginBottom: '1.5rem' }}>
             <div
               className={`role-option ${selectedRole === 'student' ? 'active' : ''}`}
               onClick={() => setSelectedRole('student')}
+              style={{ padding: '0.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
             >
-              <User size={28} strokeWidth={1.5} />
-              <span>Student</span>
+              <User size={24} strokeWidth={1.5} />
+              <span style={{ fontSize: '0.85rem' }}>Student</span>
             </div>
             <div
               className={`role-option ${selectedRole === 'faculty' ? 'active' : ''}`}
               onClick={() => setSelectedRole('faculty')}
+              style={{ padding: '0.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
             >
-              <GraduationCap size={28} strokeWidth={1.5} />
-              <span>Faculty</span>
+              <GraduationCap size={24} strokeWidth={1.5} />
+              <span style={{ fontSize: '0.85rem' }}>Faculty</span>
+            </div>
+            <div
+              className={`role-option ${selectedRole === 'admin' ? 'active' : ''}`}
+              onClick={() => setSelectedRole('admin')}
+              style={{ padding: '0.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
+            >
+              <ShieldCheck size={24} strokeWidth={1.5} />
+              <span style={{ fontSize: '0.85rem' }}>Admin</span>
             </div>
           </div>
 

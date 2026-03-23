@@ -5,10 +5,10 @@ import { BookOpen } from 'lucide-react';
 const SubjectHeatmap = ({ data }) => {
   // Color based on attendance rate matching new root variables
   const getColor = (rate) => {
-    if (rate >= 90) return '#10b981'; // success
-    if (rate >= 75) return '#3b82f6'; // info
-    if (rate >= 60) return '#f59e0b'; // warning
-    return '#ef4444';                 // danger
+    if (rate >= 90) return '#22c55e'; // success
+    if (rate >= 75) return '#0ea5e9'; // info
+    if (rate >= 60) return '#f97316'; // warning
+    return '#f43f5e';                 // danger
   };
 
   return (
@@ -23,35 +23,35 @@ const SubjectHeatmap = ({ data }) => {
       <div className="chart-container">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(226, 232, 240, 0.5)" horizontal={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(196, 181, 253, 0.3)" horizontal={false} />
             <XAxis
               type="number"
               domain={[0, 100]}
-              tick={{ fontSize: 12, fill: '#64748b' }}
+              tick={{ fontSize: 12, fill: '#6b21a8' }}
               tickLine={false}
-              axisLine={{ stroke: '#e2e8f0' }}
+              axisLine={{ stroke: 'rgba(196, 181, 253, 0.4)' }}
             />
             <YAxis
               type="category"
               dataKey="code"
               width={80}
-              tick={{ fontSize: 12, fill: '#0f172a', fontWeight: 600 }}
+              tick={{ fontSize: 12, fill: '#1e1b4b', fontWeight: 600 }}
               tickLine={false}
               axisLine={false}
             />
             <Tooltip
-              cursor={{ fill: 'rgba(241, 245, 249, 0.5)' }}
+              cursor={{ fill: 'rgba(124, 58, 237, 0.04)' }}
               contentStyle={{
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
                 backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(226, 232, 240, 0.8)',
+                border: '1px solid rgba(196, 181, 253, 0.4)',
                 borderRadius: '0.75rem',
-                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                boxShadow: '0 10px 20px -4px rgba(124, 58, 237, 0.12)',
                 padding: '1rem',
                 fontFamily: 'Inter, sans-serif'
               }}
               itemStyle={{ fontSize: '0.95rem', fontWeight: 600, padding: '2px 0' }}
-              labelStyle={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+              labelStyle={{ fontSize: '0.75rem', color: '#6b21a8', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}
               formatter={(value, name) => {
                 if (name === 'attendanceRate') return [`${value}%`, 'Attendance Rate'];
                 return [value, name];
@@ -81,16 +81,16 @@ const SubjectHeatmap = ({ data }) => {
             {data.map((subject, index) => (
               <tr key={index}>
                 <td>
-                  <div style={{ fontWeight: 600, color: '#0f172a' }}>{subject.code}</div>
-                  <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>{subject.subject}</div>
+                  <div style={{ fontWeight: 600, color: '#1e1b4b' }}>{subject.code}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#6b21a8', marginTop: '0.25rem' }}>{subject.subject}</div>
                 </td>
-                <td className="text-center" style={{ color: '#10b981', fontWeight: 600 }}>
+                <td className="text-center" style={{ color: '#22c55e', fontWeight: 600 }}>
                   {subject.present}
                 </td>
-                <td className="text-center" style={{ color: '#ef4444', fontWeight: 600 }}>
+                <td className="text-center" style={{ color: '#f43f5e', fontWeight: 600 }}>
                   {subject.absent}
                 </td>
-                <td className="text-center" style={{ color: '#f59e0b', fontWeight: 600 }}>
+                <td className="text-center" style={{ color: '#f97316', fontWeight: 600 }}>
                   {subject.late}
                 </td>
                 <td style={{ textAlign: 'right' }}>
