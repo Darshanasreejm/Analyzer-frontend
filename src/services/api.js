@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://student-attendance-analyzer-backend.onrender.com';
 
 const getHeaders = () => {
     const user = JSON.parse(localStorage.getItem('currentUser'));
